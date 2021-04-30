@@ -1,8 +1,12 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv').config();
+
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
+const jwtStrategy = require('./jwt');
+passport.use(jwtStrategy);
 
 const app = express();
 
@@ -53,8 +57,20 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-app.post('/api/signup', (req, res) => {
-  console.log('SIGN UP TEST');
+app.get('/api/signup', (req, res) => {
+  //console.log('SIGN UP TEST');
+  res.json({
+    message: 'derp'
+  });
 });
+
+app.get("/protected", passport.authenticate('jwt', { session: false }), (req, res) => {
+  return res.status(200).send("YAY! this is a protected Route")
+});
+
+app.get("/unprotected", (req, res) => {
+  return res.status(200).send("YAY! this is an unprotected Route")
+});
+
 
 app.listen(3002, () => console.log('Server started on port 3002'));
