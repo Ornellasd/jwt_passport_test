@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv').config();
-
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const jwtStrategy = require('./jwt');
@@ -38,7 +38,6 @@ app.post('/api/login', (req, res) => {
 
   User.findOne({ username: username }, (err, user) => {
     if(err) {
-      console.log('WEEOWEEEOWEE');
       res.json(err);
     }
     if(user && user.password == password) {
@@ -57,10 +56,15 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-app.get('/api/signup', (req, res) => {
-  //console.log('SIGN UP TEST');
-  res.json({
-    message: 'derp'
+app.post('/api/signup', (req, res, next) => {
+  let { username, password } = req.body;
+  const user = new User({
+    username,
+    password
+  }).save(err => {
+    if(err) {
+      return next(err);
+    };
   });
 });
 
